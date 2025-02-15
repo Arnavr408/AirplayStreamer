@@ -8,6 +8,6 @@
   },
   "scripts": {
     "start": "node server.js",
-    "postinstall": "node install-puppeteer.js"
+    "postinstall": "npx puppeteer browsers install chrome"
   }
 }
