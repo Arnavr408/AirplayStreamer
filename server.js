@@ -3,23 +3,22 @@ const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const cors = require('cors');
 
-puppeteer.use(StealthPlugin()); // Enable stealth mode
+puppeteer.use(StealthPlugin());
 
 const app = express();
 app.use(cors());
 
-const PORT = process.env.PORT || 3000; // Use Render's dynamic port
+const PORT = process.env.PORT || 3000;
 
-// Puppeteer route
 app.get('/extract-iframe', async (req, res) => {
     const targetURL = req.query.url;
     if (!targetURL) return res.status(400).json({ error: "No URL provided" });
 
     try {
         console.log(`🌍 Opening browser for: ${targetURL}`);
+
         const browser = await puppeteer.launch({
-            headless: "new", // New stable headless mode
-            executablePath: "/opt/render/.cache/puppeteer/chrome/linux-133.0.6943.98/chrome-linux64/chrome",
+            headless: "new",
             args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
 
