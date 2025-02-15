@@ -2,21 +2,13 @@ const express = require('express');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const cors = require('cors');
-const path = require('path');
 
 puppeteer.use(StealthPlugin()); // Enable stealth mode
 
 const app = express();
 app.use(cors());
-const PORT = 3000;
 
-// Serve static files (for index.html)
-app.use(express.static(path.join(__dirname)));
-
-// Serve index.html when accessing "/"
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
+const PORT = process.env.PORT || 3000; // Use Render's dynamic port
 
 // Puppeteer route
 app.get('/extract-iframe', async (req, res) => {
@@ -24,24 +16,22 @@ app.get('/extract-iframe', async (req, res) => {
     if (!targetURL) return res.status(400).json({ error: "No URL provided" });
 
     try {
+        console.log(`🌍 Opening browser for: ${targetURL}`);
         const browser = await puppeteer.launch({
-            headless: "new",
-            executablePath: "/opt/render/.cache/puppeteer/chrome/linux-133.0.6943.98/chrome",
+            headless: "new", // New stable headless mode
+            executablePath: "/opt/render/.cache/puppeteer/chrome/linux-133.0.6943.98/chrome-linux64/chrome",
             args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
-        
 
         const page = await browser.newPage();
         await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36');
 
-        console.log(`🌍 Navigating to: ${targetURL}`);
-        await page.goto(targetURL, { waitUntil: 'networkidle2' });
+        console.log("🔍 Navigating...");
+        await page.goto(targetURL, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
         console.log("🔍 Extracting iframe...");
         const iframeSrc = await page.evaluate(() => {
-            let iframe = document.querySelector("iframe");
-            if (!iframe) iframe = document.querySelector("embed"); // Try <embed>
-            if (!iframe) iframe = document.querySelector("video"); // Try <video>
+            let iframe = document.querySelector("iframe") || document.querySelector("embed") || document.querySelector("video");
             return iframe ? iframe.src : null;
         });
 
@@ -62,5 +52,5 @@ app.get('/extract-iframe', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`✅ Server running on http://localhost:${PORT}`);
+    console.log(`✅ Server running on port ${PORT}`);
 });
