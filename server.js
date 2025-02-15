@@ -24,10 +24,12 @@ app.get('/extract-iframe', async (req, res) => {
     if (!targetURL) return res.status(400).json({ error: "No URL provided" });
 
     try {
-        const browser = await puppeteer.launch({ 
+        const browser = await puppeteer.launch({
             headless: "new",
-            args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-blink-features=AutomationControlled']
+            executablePath: "/opt/render/.cache/puppeteer/chrome/linux-133.0.6943.98/chrome",
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
+        
 
         const page = await browser.newPage();
         await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36');
