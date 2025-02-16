@@ -53,7 +53,7 @@ app.get('/extract-iframe', async (req, res) => {
         });
 
         console.log("🔍 Navigating...");
-        await page.goto(targetURL, { waitUntil: 'networkidle2', timeout: 60000 });
+        await page.goto(targetURL, { waitUntil: 'networkidle2', timeout: 240000 });
 
         // Debug: Print full page HTML
         const pageContent = await page.content();
