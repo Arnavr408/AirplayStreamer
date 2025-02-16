@@ -37,17 +37,17 @@ app.get('/extract-iframe', async (req, res) => {
 
     try {
         console.log(`🌍 Opening browser for: ${targetURL}`);
+const browser = await puppeteer.launch({
+    headless: "new",
+    executablePath: puppeteer.executablePath(),
+    args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--proxy-server=http://204.236.137.68:80'
+    ]
+});
 
-        const browser = await puppeteer.launch({
-            headless: "new",
-            executablePath: puppeteer.executablePath(),
-            args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-blink-features=AutomationControlled',
-                '--disable-web-security'
-            ]
-        });
+
 
         const page = await browser.newPage();
 
