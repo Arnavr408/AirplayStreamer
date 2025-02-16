@@ -41,19 +41,33 @@ app.get('/extract-iframe', async (req, res) => {
         const browser = await puppeteer.launch({
             headless: "new",
             executablePath: puppeteer.executablePath(),
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-blink-features=AutomationControlled',
+                '--disable-web-security'
+            ]
         });
 
         const page = await browser.newPage();
-        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36');
-        await page.setExtraHTTPHeaders({ 'Accept-Language': 'en-US,en;q=0.9' });
 
+        // ✅ Use a Safari User-Agent to bypass Cloudflare blocks
+        await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 13_4_1) AppleWebKit/537.36 (KHTML, like Gecko) Version/16.4 Safari/537.36');
+
+        // ✅ Add Headers to mimic real Safari requests
+        await page.setExtraHTTPHeaders({
+            'Accept-Language': 'en-US,en;q=0.9',
+            'DNT': '1', // Do Not Track
+            'Upgrade-Insecure-Requests': '1'
+        });
+
+        // ✅ Bypass bot detection
         await page.evaluateOnNewDocument(() => {
             Object.defineProperty(navigator, 'webdriver', { get: () => false });
         });
 
         console.log("🔍 Navigating...");
-        await page.goto(targetURL, { waitUntil: 'networkidle2', timeout: 240000 });
+        await page.goto(targetURL, { waitUntil: 'networkidle2', timeout: 240000 }); // ⬆️ Increased to 4 minutes
 
         // Debug: Print full page HTML
         const pageContent = await page.content();
