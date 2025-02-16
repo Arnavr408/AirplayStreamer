@@ -43,9 +43,10 @@ const browser = await puppeteer.launch({
     args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
-        '--proxy-server=http://204.236.137.68:80'
+        '--ignore-certificate-errors'
     ]
 });
+
 
 
 
