@@ -32,23 +32,28 @@ app.use((req, res, next) => {
 const PORT = process.env.PORT || 3000;
 
 app.get('/extract-iframe', async (req, res) => {
+    const publicIp = await page.evaluate(async () => {
+        const res = await fetch("https://api64.ipify.org?format=json");
+        return res.json();
+    });
+    console.log("🛰️ Railway Server Public IP:", publicIp);
+    
     const targetURL = req.query.url;
     if (!targetURL) return res.status(400).json({ error: "No URL provided" });
 
     try {
         console.log(`🌍 Opening browser for: ${targetURL}`);
-const browser = await puppeteer.launch({
-    headless: "new",
-    executablePath: puppeteer.executablePath(),
-    args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--ignore-certificate-errors'
-    ]
-});
 
-
-
+        const browser = await puppeteer.launch({
+            headless: "new",
+            executablePath: puppeteer.executablePath(),
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-blink-features=AutomationControlled',
+                '--disable-web-security'
+            ]
+        });
 
         const page = await browser.newPage();
 
