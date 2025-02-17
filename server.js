@@ -32,10 +32,10 @@ app.use((req, res, next) => {
 const PORT = process.env.PORT || 3000;
 
 app.get('/extract-iframe', async (req, res) => {
-    const publicIp = await page.evaluate(async () => {
-        const res = await fetch("https://api64.ipify.org?format=json");
-        return res.json();
-    });
+    const publicIpRes = await fetch("https://ifconfig.me/ip");
+    const publicIp = await publicIpRes.text();
+    console.log("🛰️ Railway Server Public IP:", publicIp);
+    
     console.log("🛰️ Railway Server Public IP:", publicIp);
     
     const targetURL = req.query.url;
