@@ -1,22 +1,16 @@
 {
-  "name": "puppeteer-server",
-  "version": "1.0.0",
-  "description": "A web scraper using Puppeteer",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js",
-    "preinstall": "npm install --no-audit --no-fund",
-    "postinstall": "npx puppeteer browsers install chrome"
-  },
   "dependencies": {
-    "express": "^4.21.2",
+    "axios": "^1.7.9",
+    "cheerio": "^1.0.0",
     "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "node-fetch": "^3.3.2",
     "puppeteer": "^24.2.1",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2"
   },
-  "engines": {
-    "node": ">=20"
-  },
-  "license": "MIT"
+  "scripts": {
+    "start": "node server.js",
+    "postinstall": "npx puppeteer browsers install chrome"
+  }
 }
