@@ -11,6 +11,6 @@
   },
   "scripts": {
     "start": "node server.js",
-    "postinstall": "npx puppeteer browsers install chrome"
+    "postinstall": "npx puppeteer browsers install chrome && npm rebuild"
   }
 }
