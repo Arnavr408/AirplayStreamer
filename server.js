@@ -38,14 +38,15 @@ app.get('/extract-iframe', async (req, res) => {
     try {
         console.log(`🌍 Opening browser for: ${targetURL}`);
 
-        const browser = await puppeteer.launch({
-            headless: "new",
-            executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath(),
-            args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox'
-            ]
-        });
+const browser = await puppeteer.launch({
+    headless: "new",
+    executablePath: "/opt/render/.cache/puppeteer/chrome/linux-133.0.6943.98/chrome-linux64/chrome",
+    args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox'
+    ]
+});
+
 
         const page = await browser.newPage();
 
