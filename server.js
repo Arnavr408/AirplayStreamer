@@ -9,7 +9,7 @@ puppeteer.use(StealthPlugin());
 
 const app = express();
 
-// ✅ Fix CORS and Force HTTPS
+// ✅ CORS settings
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'OPTIONS'],
@@ -32,12 +32,6 @@ app.use((req, res, next) => {
 const PORT = process.env.PORT || 3000;
 
 app.get('/extract-iframe', async (req, res) => {
-    const publicIpRes = await fetch("https://ifconfig.me/ip");
-    const publicIp = await publicIpRes.text();
-    console.log("🛰️ Railway Server Public IP:", publicIp);
-    
-    console.log("🛰️ Railway Server Public IP:", publicIp);
-    
     const targetURL = req.query.url;
     if (!targetURL) return res.status(400).json({ error: "No URL provided" });
 
@@ -46,12 +40,10 @@ app.get('/extract-iframe', async (req, res) => {
 
         const browser = await puppeteer.launch({
             headless: "new",
-            executablePath: puppeteer.executablePath(),
+            executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath(),
             args: [
                 '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-blink-features=AutomationControlled',
-                '--disable-web-security'
+                '--disable-setuid-sandbox'
             ]
         });
 
@@ -73,38 +65,20 @@ app.get('/extract-iframe', async (req, res) => {
         });
 
         console.log("🔍 Navigating...");
-        await page.goto(targetURL, { waitUntil: 'networkidle2', timeout: 240000 }); // ⬆️ Increased to 4 minutes
-
-        // Debug: Print full page HTML
-        const pageContent = await page.content();
-        console.log("📄 Full Page HTML:\n", pageContent);
+        await page.goto(targetURL, { waitUntil: 'networkidle2', timeout: 60000 });
 
         console.log("🔍 Extracting iframe...");
         const iframeSrc = await page.evaluate(() => {
-            function getAllIframes() {
-                return [...document.querySelectorAll("iframe, embed, video")].map(e => e.src).filter(src => src);
-            }
-
-            return new Promise((resolve) => {
-                const checkForIframe = () => {
-                    const iframes = getAllIframes();
-                    if (iframes.length > 0) {
-                        resolve(iframes[0]);
-                    } else {
-                        setTimeout(checkForIframe, 1000);
-                    }
-                };
-                checkForIframe();
-            });
+            return [...document.querySelectorAll("iframe, embed, video")].map(e => e.src).filter(src => src);
         });
 
         console.log("🔍 Found Iframes:", iframeSrc);
 
         await browser.close();
 
-        if (iframeSrc) {
-            console.log("✅ Iframe found:", iframeSrc);
-            res.json({ iframe: iframeSrc });
+        if (iframeSrc.length > 0) {
+            console.log("✅ Iframe found:", iframeSrc[0]);
+            res.json({ iframe: iframeSrc[0] });
         } else {
             console.log("❌ No iframe found.");
             res.status(404).json({ error: "No iframe found on the page" });
@@ -116,7 +90,7 @@ app.get('/extract-iframe', async (req, res) => {
     }
 });
 
-// ✅ Enable HTTPS
+// ✅ Enable HTTPS if certs exist
 if (fs.existsSync('./cert.pem') && fs.existsSync('./key.pem')) {
     const httpsOptions = {
         key: fs.readFileSync('./key.pem'),
