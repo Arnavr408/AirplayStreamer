@@ -40,12 +40,13 @@ app.get('/extract-iframe', async (req, res) => {
 
 const browser = await puppeteer.launch({
     headless: "new",
-    executablePath: "/opt/render/.cache/puppeteer/chrome/linux-133.0.6943.98/chrome-linux64/chrome",
+    executablePath: "/usr/bin/google-chrome-stable",  // Use system-installed Chrome
     args: [
         '--no-sandbox',
         '--disable-setuid-sandbox'
     ]
 });
+
 
 
         const page = await browser.newPage();
